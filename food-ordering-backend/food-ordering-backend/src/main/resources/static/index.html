@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Ordering App</title>
+    <link rel="stylesheet" href="css/modern-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-utensils"></i>
+                <span>FoodOrder</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link active">Home</a>
+                <a href="#menu" class="nav-link">Menu</a>
+                <a href="#orders" class="nav-link" id="ordersLink" style="display: none;">Orders</a>
+                <a href="#admin" class="nav-link" id="adminLink" style="display: none;">Admin</a>
+            </div>
+            <div class="nav-actions">
+                <div id="authButtons" class="auth-buttons">
+                    <a href="login.html" class="btn btn-outline">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="register.html" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Register</span>
+                    </a>
+                </div>
+                <div id="userMenu" class="user-menu" style="display: none;">
+                    <div class="profile-dropdown">
+                        <div class="profile-trigger">
+                            <div class="profile-avatar">U</div>
+                            <div class="profile-info">
+                                <span class="profile-name" id="profileName">User Name</span>
+                                <span class="profile-role" id="profileRole">Role</span>
+                            </div>
+                            <i class="fas fa-chevron-down profile-arrow"></i>
+                        </div>
+                        <div class="profile-dropdown-menu">
+                            <div class="dropdown-header">
+                                <div class="dropdown-avatar">U</div>
+                                <div class="dropdown-info">
+                                    <div class="dropdown-name" id="dropdownName">User Name</div>
+                                    <div class="dropdown-email" id="dropdownEmail">user@email.com</div>
+                                    <div class="dropdown-role-badge" id="dropdownRoleBadge">CUSTOMER</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-menu-items">
+                                <a href="#" class="dropdown-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>My Profile</span>
+                                </a>
+                                <a href="#orders" class="dropdown-item" onclick="showSection('orders', true); updateActiveNavLink('orders'); closeProfileDropdown();">
+                                    <i class="fas fa-receipt"></i>
+                                    <span>My Orders</span>
+                                </a>
+                                <a href="#admin" class="dropdown-item" id="adminPanelLink" onclick="showSection('admin', true); updateActiveNavLink('admin'); closeProfileDropdown();" style="display: none;">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Admin Panel</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item logout-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-icon" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
+                    <div class="cart-ripple"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="section active">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Delicious Food Delivered Fast</h1>
+                <p>Order your favorite meals from our extensive menu and get them delivered to your doorstep!</p>
+                <button class="btn btn-primary" onclick="showSection('menu', true); updateActiveNavLink('menu');">View Menu</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="section">
+        <div class="container">
+            <h2>Our Menu</h2>
+            <div class="menu-controls">
+                <div class="menu-filters">
+                    <div class="filter-group">
+                        <input type="text" id="searchFood" placeholder="🔍 Search food items..." onkeyup="searchFoods()">
+                    </div>
+                    <div class="filter-group">
+                        <select id="categoryFilter" onchange="filterByCategory()">
+                            <option value="">All Categories</option>
+                            <option value="main-course">Main Course</option>
+                            <option value="appetizers">Appetizers</option>
+                            <option value="beverages">Beverages</option>
+                            <option value="desserts">Desserts</option>
+                            <option value="rice-dishes">Rice Dishes</option>
+                            <option value="curries">Curries</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="priceFilter" onchange="filterByPrice()">
+                            <option value="">All Prices</option>
+                            <option value="0-150">₹0 - ₹150</option>
+                            <option value="150-300">₹150 - ₹300</option>
+                            <option value="300-500">₹300 - ₹500</option>
+                            <option value="500+">₹500+</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Admin-only controls (hidden by default) -->
+                <div id="adminMenuControls" class="admin-controls" style="display: none;">
+                    <button class="btn btn-secondary" onclick="showAddFoodForm()">
+                        <i class="fas fa-plus"></i> Add New Food Item
+                    </button>
+                </div>
+            </div>
+            <div id="menuItems" class="menu-grid">
+                <!-- Menu items will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Orders Section -->
+    <section id="orders" class="section">
+        <div class="container">
+            <h2>Order Management</h2>
+            <div class="order-tabs">
+                <button class="tab-btn active" onclick="showOrderTab('checkout')">Checkout</button>
+                <button class="tab-btn" onclick="showOrderTab('history')">Order History</button>
+            </div>
+            
+            <!-- Checkout Tab -->
+            <div id="checkout-tab" class="tab-content active">
+                <div class="checkout-section">
+                    <h3>Checkout</h3>
+                    <form id="checkoutForm" onsubmit="checkout(event)">
+                        <div class="form-group">
+                            <label for="customerName">Customer Name:</label>
+                            <input type="text" id="customerName" required>
+                        </div>
+                        <div id="cartItems" class="cart-items">
+                            <!-- Cart items will be displayed here -->
+                        </div>
+                        <div class="total-section">
+                            <h4>Total: ₹<span id="totalAmount">0.00</span></h4>
+                            <button type="submit" class="btn btn-primary">Place Order</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Order History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="order-history">
+                    <h3>Order History</h3>
+                    <div id="orderHistory" class="order-list">
+                        <!-- Order history will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Section -->
+    <section id="admin" class="section">
+        <div class="container">
+            <h2>Admin Panel</h2>
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="showAdminTab('foods')">Manage Foods</button>
+                <button class="tab-btn" onclick="showAdminTab('orders')">Manage Orders</button>
+                <button class="tab-btn" onclick="showAdminTab('users')">Manage Users</button>
+            </div>
+
+            <!-- Foods Admin Tab -->
+            <div id="foods-admin-tab" class="tab-content active">
+                <div class="admin-section">
+                    <h3>Food Management</h3>
+                    <div id="adminFoodList" class="admin-list">
+                        <!-- Admin food list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Admin Tab -->
+            <div id="orders-admin-tab" class="tab-content">
+                <div class="admin-section">
+                    <h3>Order Management</h3>
+                    <div id="adminOrderList" class="admin-list">
+                        <!-- Admin order list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Admin Tab -->
+            <div id="users-admin-tab" class="tab-content">
+                <div class="admin-section">
+                    <h3>User Management</h3>
+                    <div class="form-group">
+                        <button class="btn btn-secondary" onclick="showAddUserForm()">
+                            <i class="fas fa-plus"></i> Add New User
+                        </button>
+                    </div>
+                    <div id="adminUserList" class="admin-list">
+                        <!-- Admin user list will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="close-cart" onclick="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-content">
+            <div id="cartItemsList" class="cart-items-list">
+                <!-- Cart items will be displayed here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <strong>Total: ₹<span id="cartTotal">0.00</span></strong>
+                </div>
+                <button class="btn btn-primary" onclick="goToCheckout()">Proceed to Checkout</button>
+                <button class="btn btn-secondary" onclick="clearCart()">Clear Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Food -->
+    <div id="foodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="foodModalTitle">Add New Food Item</h3>
+                <span class="close" onclick="closeFoodModal()">&times;</span>
+            </div>
+            <form id="foodForm" onsubmit="saveFoodItem(event)">
+                <input type="hidden" id="foodId">
+                <div class="form-group">
+                    <label for="foodName">Name:</label>
+                    <input type="text" id="foodName" required minlength="2" maxlength="50" 
+                           placeholder="Enter food item name (2-50 characters)">
+                    <small style="color: #666; font-size: 0.85em;">2-50 characters required</small>
+                </div>
+                <div class="form-group">
+                    <label for="foodPrice">Price (₹):</label>
+                    <input type="number" id="foodPrice" min="1" max="10000" step="0.01" required 
+                           placeholder="Enter price in rupees (₹1 - ₹10,000)">
+                    <small style="color: #666; font-size: 0.85em;">Minimum ₹1, Maximum ₹10,000</small>
+                </div>
+                <div class="form-group">
+                    <label for="foodDescription">Description:</label>
+                    <textarea id="foodDescription" rows="4" required minlength="5" maxlength="200" 
+                              placeholder="Enter detailed description of the food item (5-200 characters)"></textarea>
+                    <small style="color: #666; font-size: 0.85em;">
+                        <span id="descCharCount">0</span>/200 characters (minimum 5 required)
+                    </small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeFoodModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Add User -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New User</h3>
+                <span class="close" onclick="closeUserModal()">&times;</span>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Role:</label>
+                    <select id="role" required>
+                        <option value="CUSTOMER">Customer</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+
+
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <span id="notificationText"></span>
+        <button onclick="hideNotification()">&times;</button>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
